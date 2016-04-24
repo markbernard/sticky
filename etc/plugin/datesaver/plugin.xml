@@ -1,0 +1,5 @@
+<plugin name="Date Saver">
+	<jar name="datesaver.jar" />
+	<class name="sticky.plugin.datesaver.Main" />
+	<view name="DS" />
+</plugin>

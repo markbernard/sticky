@@ -1,0 +1,5 @@
+<plugin name="Password Saver">
+	<jar name="passwordsaver.jar" />
+	<class name="sticky.plugin.passwordsaver.Main" />
+	<view name="PW" />
+</plugin>

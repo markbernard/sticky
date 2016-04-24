@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!-- This build.xml file is used to build the db module -->
+    <project name="sticky" default="build" basedir=".">
+        <description>
+            Ant build script for WBRO DAL
+        </description>
+
+        <!-- Global properties for this script -->
+        <property environment="env" />
+        <property name="sticky.root" location="${basedir}" />
+        <property name="sticky.src" location="${sticky.root}/src" />
+        <property name="sticky.bin" location="${sticky.root}/bin" />
+        <property name="sticky.lib" location="${sticky.root}/lib" />
+        <property name="sticky.dist" location="${sticky.root}/dist" />
+        <property name="sticky.app" location="${sticky.dist}/Sticky" />
+        <property name="sticky.plugin" location="${sticky.app}/plugin" />
+        <property name="sticky.etc" location="${sticky.root}/etc" />
+        <property name="sticky.doc" location="${sticky.root}/doc" />
+        
+        <!-- plugins -->
+        <property name="sticky.plugin.datesaver" location="${sticky.plugin}/datesaver" />
+        <property name="sticky.plugin.notepad" location="${sticky.plugin}/notepad" />
+        <property name="sticky.plugin.passwordsaver" location="${sticky.plugin}/passwordsaver" />
+
+        <path id="project.class.path">
+            <pathelement location="${sticky.bin}" />
+            <pathelement location="${sticky.lib}/jdic.jar" />
+            <pathelement location="${sticky.lib}/liquidlnf.jar" />
+        </path>
+
+        <property name="classpath" refid="project.class.path" />
+
+        <target name="init">
+            <echo>${ant.version}</echo>
+            <!-- Creates a time stamp -->
+            <tstamp>
+                <format property="timestamp" pattern="yyyyMMddHHmmss" />
+            </tstamp>
+            <!-- Create the classes directory structure -->
+            <mkdir dir="${sticky.dist}" />
+            <mkdir dir="${sticky.app}" />
+            <mkdir dir="${sticky.plugin}" />
+            <mkdir dir="${sticky.plugin.datesaver}" />
+            <mkdir dir="${sticky.plugin.notepad}" />
+            <mkdir dir="${sticky.plugin.passwordsaver}" />
+        </target>
+
+        <target name="compile" depends="init" description="compiles all source files">
+            <!-- Compile the java code from ${sticky.src} into ${classes} -->
+            <javac destdir="${sticky.bin}" classpath="${classpath}" debug="on" deprecation="off">
+                <src path="${sticky.src}" />
+                <include name="**/*.java" />
+            </javac>
+        </target>
+
+        <target name="recompile" depends="clean, compile" description="rebuilds the project" />
+
+        <target name="build" depends="_package_jar" description="builds the project" >
+            <copy todir="${sticky.plugin}">
+                <fileset dir="${sticky.etc}/plugin/">
+                    <include name="notepad/plugin.xml"/>
+                    <include name="datesaver/plugin.xml"/>
+                    <include name="passwordsaver/plugin.xml"/>
+                </fileset>
+            </copy>
+            <copy todir="${sticky.app}">
+                <fileset dir="${sticky.lib}">
+                    <include name="*.*"/>
+                </fileset>
+            </copy>
+			<!-- full app bundle -->
+            <zip destfile="${sticky.dist}/sticky_full.zip">
+                <fileset dir="${sticky.dist}">
+                    <include name="Sticky/**" />
+                </fileset>
+            </zip>
+        </target>
+
+        <target name="rebuild" depends="clean, build" description="rebuilds the project" />
+
+        <target name="clean" description="deletes classes and archive directories">
+            <!-- Delete the output directory trees -->
+            <delete>
+                <fileset dir="${sticky.bin}">
+                    <include name="**/*.class"/>
+                </fileset>
+            </delete>
+            <delete dir="${sticky.dist}" />
+        </target>
+
+        <target name="_package_jar" depends="compile" description="generate the jar file">
+            <jar jarfile="${sticky.app}/Sticky.jar">
+                <manifest>
+                    <attribute name="Main-Class" value="sticky.gui.Main"/>
+                    <attribute name="Class-Path" value="liquidlnf.jar jdic.jar jdic_stub.jar"/>
+                </manifest>
+                <fileset dir="${sticky.bin}">
+                    <include name="**/*.class"/>
+                    <include name="images/**"/>
+                    <exclude name="sticky/plugin/**" />
+                </fileset>
+            </jar>
+            <zip destfile="${sticky.plugin.datesaver}/datesaver.jar">
+                <fileset dir="${sticky.bin}">
+                    <include name="sticky/plugin/datesaver/**" />
+                </fileset>
+            </zip>
+            <zip destfile="${sticky.plugin.notepad}/notepad.jar">
+                <fileset dir="${sticky.bin}">
+                    <include name="sticky/plugin/notepad/**" />
+                </fileset>
+            </zip>
+            <zip destfile="${sticky.plugin.passwordsaver}/passwordsaver.jar">
+                <fileset dir="${sticky.bin}">
+                    <include name="sticky/plugin/passwordsaver/**" />
+                </fileset>
+            </zip>
+        </target>
+    </project>

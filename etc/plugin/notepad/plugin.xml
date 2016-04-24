@@ -1,0 +1,5 @@
+<plugin name="Notepad">
+	<jar name="notepad.jar" />
+	<class name="sticky.plugin.notepad.Main" />
+	<view name="NP" />
+</plugin>
